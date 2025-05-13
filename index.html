@@ -5,7 +5,7 @@
   </head>
   <body>
     <div style="display: flex; justify-content: space-between">
-      <h2 class="heading-h2">EOD (Before Break)</h2>
+      <h2 class="heading-h2">EOD</h2>
       <h2
         class="heading-h2"
         id="time-balance-ext-098-5"
@@ -13,6 +13,10 @@
       >
         00:00
       </h2>
+    </div>
+    <div style="display: flex; justify-content: space-between">
+      <h2 class="heading-h2">Break</h2>
+      <h2 class="heading-h2" id="time-balance-ext-098-12">00:00</h2>
     </div>
     <div
       style="display: flex; justify-content: space-between"
@@ -27,16 +31,54 @@
         00:00
       </h2>
     </div>
-    <div style="display: flex; justify-content: space-between">
+    <div
+      style="display: flex; justify-content: space-between; margin-bottom: 1rem"
+    >
       <h2 class="heading-h2" id="time-balance-ext-098-8">
         Remaining Time (After Break)
       </h2>
       <h2 class="heading-h2" id="time-balance-ext-098-7">00:00</h2>
     </div>
 
-    <h2>Balance Sheet</h2>
+    <p
+      class="green-color"
+      style="
+        margin-left: auto;
+        text-decoration: underline;
+        font-size: 15px;
+        cursor: pointer;
+        width: fit-content;
+      "
+      id="show-more"
+    >
+      Show More
+    </p>
 
-    <table>
+    <div id="extra-feature" class="extra-feature" style="margin-bottom: 1.5rem">
+      <div style="display: flex; justify-content: space-between">
+        <h2 class="heading-h2" id="time-balance-ext-098-9">
+          Select Today's Leave Time
+        </h2>
+        <input type="time" id="time-input" />
+      </div>
+      <div
+        id="time-balance-ext-098-11"
+        style="display: flex; justify-content: space-between; margin-bottom: 1rem;"
+      ></div>
+
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          margin-top: 0.5rem;
+        "
+      >
+        <h2 class="heading-h2" id="time-balance-ext-098-9">Skip Dates</h2>
+        <input type="date" id="skip-input" />
+      </div>
+      <div id="skip-time"></div>
+    </div>
+    <table style="margin-top: 1rem">
       <thead>
         <tr>
           <th class="index">No.</th>
@@ -56,9 +98,26 @@
       &#128680;Always refresh Once or Twice before use to get accurate
       data&#128680;
     </p>
-    <button id="calculate" class="btn default">Calculate</button>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      "
+    >
+      <button id="calculate" class="btn default">Calculate</button>
+      <div style="display: flex; gap: 1rem">
+        <p style="margin: 0; color: #2b3440">Made By Rathod Umang</p>
+        <span style="font-size: 11px" class="yellow-color">V 2.0.0</span>
+      </div>
+    </div>
     <script src="./index.js"></script>
   </body>
 </html>
 
-<!-- by Umang Rathod , 28-Mar-2025 -->
+<!-- by Umang Rathod ,
+ 
+28-Mar-2025 , V 1.0.0
+13-May-2025 , V 2.0.0
+
+-->

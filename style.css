@@ -9,10 +9,19 @@ table {
   border-collapse: collapse;
 }
 
+body {
+  background-color: #2b3440;
+  color: #c7c2ba;
+}
+
 th {
-  background: #4caf50;
-  min-width: 160px;
+  background: #3a98a2;
+  min-width: 130px;
   color: white;
+}
+
+th:last-child {
+  min-width: 180px;
 }
 
 th,
@@ -24,7 +33,7 @@ table th.index {
   min-width: 50px !important;
 }
 tr:nth-child(even) {
-  background: #f2fcf2;
+  background: #1f252e;
 }
 
 /* tr:hover {
@@ -55,7 +64,7 @@ tr:nth-child(even) {
   padding: 10px 18px;
 }
 .btn.default {
-  background-color: #4caf50; /* Green background */
+  background-color: #3a98a2; /* Green background */
   border: none;
   color: white;
   font-weight: bold;
@@ -64,7 +73,7 @@ tr:nth-child(even) {
 }
 
 .btn.default:hover {
-  background-color: #45a049; /* Slightly darker green */
+  background-color: #317f88; /* Slightly darker green */
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -76,4 +85,11 @@ tr:nth-child(even) {
 h2.heading-h2 {
   margin: 0;
   padding: 0.2rem 0;
+}
+
+.extra-feature {
+  display: none;
+}
+.show-extra-feature {
+  display: block;
 }

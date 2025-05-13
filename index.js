@@ -2,14 +2,69 @@ const insetValue = ({ id, value }) => {
   document.getElementById(id).innerHTML = value;
 };
 
-document.getElementById("calculate").addEventListener("click", () => {
+const showMore = document.getElementById("show-more");
+showMore.addEventListener("click", (e) => {
+  e.target.classList.toggle("red-color");
+  const features = document.getElementById("extra-feature");
+  features.classList.toggle("show-extra-feature");
+});
+
+const date = document.getElementById("skip-input");
+const skipTimeBox = document.getElementById("skip-time");
+function getSkipDates() {
+  const arr = skipTimeBox.children;
+  if (arr.length === 0) return false;
+  const newDates = [];
+  for (let i = 0; i < arr.length; i++) {
+    newDates.push(arr[i]?.innerText);
+  }
+  return newDates;
+}
+
+date.addEventListener("change", (e) => {
+  const formattedDate = new Date(e.target.value).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  skipTimeBox.innerHTML =
+    skipTimeBox.innerHTML +
+    `<h2
+        class="heading-h2"
+        id="time-balance-ext-098-6"
+        style="text-transform: uppercase; text-align:right;font-size:14px;"
+      >
+        ${formattedDate}
+      </h2>`;
+});
+
+const checkTimeInputValidValue = (timeInputValue) => {
+  return timeInputValue?.length > 1
+    ? Number(timeInputValue[0]) > 12
+      ? `${Number(timeInputValue[0]) - 12}:${timeInputValue[1]} PM`
+      : `${timeInputValue[0]}:${timeInputValue[1]} AM`
+    : false;
+};
+
+document.getElementById("calculate").addEventListener("click", async () => {
+  const skipDatesArr = getSkipDates();
+  const timeInputValue = await document
+    .getElementById("time-input")
+    .value.split(":");
+  if (document.getElementById("time-balance-ext-098-1").innerHTML !== "") {
+    document.getElementById("time-balance-ext-098-1").innerHTML = "";
+  }
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { action: "calculateTime" });
+    chrome.tabs.sendMessage(tabs[0].id, {
+      action: "calculateTime",
+      timeInputValue: checkTimeInputValidValue(timeInputValue),
+      skipDatesArr,
+    });
   });
 });
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "addTimeStamp") {
-    // alert(document.getElementById("time-balance-ext-098-1").innerHTML);
     insetValue({
       id: "time-balance-ext-098-1",
       value: `${
@@ -25,7 +80,7 @@ chrome.runtime.onMessage.addListener((message) => {
        <td>
       ${message?.workedTime}
       </td>
-      <td>
+      <td style="min-width:180px">
       ${message?.data}
       </td>
       </tr>
@@ -70,85 +125,16 @@ chrome.runtime.onMessage.addListener((message) => {
       value: message.extraTimeHeading,
     });
   }
+  if (message.action === "newWorkingHours") {
+    insetValue({
+      id: "time-balance-ext-098-11",
+      value: message.value,
+    });
+  }
+  if (message.action === "breakTime") {
+    insetValue({
+      id: "time-balance-ext-098-12",
+      value: message.data,
+    });
+  }
 });
-
-// const checkTime = () => {
-//   var table = document.getElementById("all_attendace_table");
-
-//   function Includes({ r, c, value }) {
-//     return table.rows[r].cells[c].innerHTML?.includes(value);
-//   }
-
-//   function GetCellValues() {
-//     const arr = [];
-//     for (var r = 0, n = table?.rows?.length; r < n; r++) {
-//       const arr2 = [];
-//       for (var c = 0, m = table?.rows[r]?.cells?.length; c < m; c++) {
-//         if (
-//           (c === 2 || c === 4) &&
-//           (Includes({ value: "20", r, c }) || Includes({ value: ":", r, c })) &&
-//           !Includes({ value: "<", r, c })
-//         ) {
-//           console.log(table.rows[r].cells[c].innerHTML);
-//           arr2.push(table.rows[r].cells[c].innerHTML);
-//         }
-//       }
-//       if (arr2?.length > 0) {
-//         arr.push(arr2);
-//       }
-//     }
-//     return arr.filter((item) => item[1] !== "00:00");
-//   }
-
-//   const workLog = GetCellValues();
-//   // Work log data (Format: "Date, Worked Hours")
-//   console.log(workLog);
-
-//   // Convert HH:MM to total minutes
-//   const timeToMinutes = (time) => {
-//     const [hours, minutes] = time.split(":").map(Number);
-//     return hours * 60 + minutes;
-//   };
-
-//   // Convert minutes back to HH:MM format
-//   const minutesToTime = (minutes) => {
-//     const h = Math.floor(Math.abs(minutes) / 60);
-//     const m = Math.abs(minutes) % 60;
-//     return `${minutes < 0 ? "-" : ""}${String(h).padStart(2, "0")}:${String(
-//       m
-//     ).padStart(2, "0")}`;
-//   };
-
-//   // Standard work duration (8 hours 30 minutes)
-//   const standardMinutes = timeToMinutes("08:30");
-
-//   let totalExtraMinutes = 0;
-//   let totalDeficitMinutes = 0;
-
-//   // Process each day's work log
-//   workLog.forEach(([date, workedTime]) => {
-//     const workedMinutes = timeToMinutes(workedTime);
-//     const difference = workedMinutes - standardMinutes;
-
-//     if (difference > 0) {
-//       totalExtraMinutes += difference;
-//       console.log(`${date}: Extra time +${minutesToTime(difference)}`);
-//     } else {
-//       totalDeficitMinutes += Math.abs(difference);
-//       console.log(`${date}: Deficit time -${minutesToTime(difference)}`);
-//     }
-//   });
-
-//   // Calculate final extra time balance
-//   const finalBalance = totalExtraMinutes - totalDeficitMinutes;
-//   console.log(`\nTotal Extra Minutes: ${minutesToTime(totalExtraMinutes)}`);
-//   console.log(`Total Deficit Minutes: ${minutesToTime(totalDeficitMinutes)}`);
-//   console.log(`Final Extra Time Balance: ${minutesToTime(finalBalance)}`);
-//   const finalTime = `Final Extra Time Balance: ${minutesToTime(finalBalance)}`;
-
-//   document.getElementById("time-balance-ext-098-1").innerHTML = finalTime;
-// };
-
-// const btn = document.getElementById("calculate");
-
-// btn.addEventListener("click", checkTime);
