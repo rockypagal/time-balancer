@@ -123,7 +123,7 @@ const checkTime = (timeInputValue, skipDatesArr) => {
           arr2.length > 0 &&
           c === 6 &&
           table.rows[r].cells[c].childElementCount > 1 &&
-          arr2[0][1].split(":")[0] < 8 &&
+          arr2[1].split(":")[0] < 8 &&
           table.rows[r].cells[c].firstChild.innerText.includes("Day end")
         ) {
           //

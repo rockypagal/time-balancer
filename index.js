@@ -21,6 +21,7 @@ function getSkipDates() {
   return newDates;
 }
 
+
 date.addEventListener("change", (e) => {
   const formattedDate = new Date(e.target.value).toLocaleDateString("en-GB", {
     day: "2-digit",
