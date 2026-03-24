@@ -21,7 +21,6 @@ function getSkipDates() {
   return newDates;
 }
 
-
 date.addEventListener("change", (e) => {
   const formattedDate = new Date(e.target.value).toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -130,6 +129,12 @@ chrome.runtime.onMessage.addListener((message) => {
     insetValue({
       id: "time-balance-ext-098-11",
       value: message.value,
+    });
+  }
+  if (message.action === "minutesPerDayToCoverDeficit") {
+    insetValue({
+      id: "time-balance-ext-098-13",
+      value: `<span>${message.data}</span>`,
     });
   }
   if (message.action === "breakTime") {

@@ -27,13 +27,13 @@ const checkTime = (timeInputValue, skipDatesArr) => {
     const h = Math.floor(Math.abs(minutes) / 60);
     const m = Math.abs(minutes) % 60;
     return `${minutes < 0 ? "-" : ""}${String(h).padStart(2, "0")}h ${String(
-      m
+      m,
     ).padStart(2, "0")}m`;
   };
 
   const milSecondsToHours = (milSeconds) => {
     return Math.floor(
-      (Math.abs(milSeconds) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      (Math.abs(milSeconds) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
     );
   };
   const milSecondsToMinutes = (milSeconds) => {
@@ -111,7 +111,7 @@ const checkTime = (timeInputValue, skipDatesArr) => {
             c === 2 &&
             skipDatesArr &&
             skipDatesArr?.includes(
-              table.rows[r].cells[c].innerHTML.toUpperCase()
+              table.rows[r].cells[c].innerHTML.toUpperCase(),
             )
           ) {
             continue;
@@ -188,7 +188,7 @@ const checkTime = (timeInputValue, skipDatesArr) => {
 
   if (todaysData) {
     const unixTimeInMilliseconds = new Date(
-      `${date1}, ${todaysData[1]}`
+      `${date1}, ${todaysData[1]}`,
     ).valueOf();
 
     const todaysWorkedHour = todaysData[2]?.split(":");
@@ -207,13 +207,13 @@ const checkTime = (timeInputValue, skipDatesArr) => {
     chrome.runtime.sendMessage({
       action: "breakTime",
       data: `${milSecondsToHours(breakTime)}h ${milSecondsToMinutes(
-        breakTime
+        breakTime,
       )}m`,
     });
 
     const todaysDefaultWorkingHoursInMilliseconds = todaysDefaultWorkingHours(
       unixTimeInMilliseconds,
-      breakTime
+      breakTime,
     ); // default 8h 30m in ms
 
     const newUnixTimeInMilliseconds =
@@ -349,7 +349,7 @@ const checkTime = (timeInputValue, skipDatesArr) => {
       chrome.runtime.sendMessage({
         action: "addTimeStamp",
         data: `${halfDay ? "Half Day" : "Extra time"} ${checkWeekDay(
-          weekday
+          weekday,
         )} <span class="darkred-color">+${minutesToTime(difference)}</span>`,
         date,
         workedTime,
@@ -386,6 +386,59 @@ const checkTime = (timeInputValue, skipDatesArr) => {
     data: `Total Deficit Time: ${minutesToTime(totalDeficitMinutes)}`,
   });
   chrome.runtime.sendMessage({ action: "updatePopup", data: finalTime });
+
+  // HACK ***************** Calculate per day minutes to cover deficit *******************
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  let remainingWorkingDays = 0;
+
+  for (let day = today.getDate() + 1; day <= lastDayOfMonth; day++) {
+    const date = new Date(currentYear, currentMonth, day);
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      remainingWorkingDays++;
+    }
+  }
+
+  if (finalBalance < 0) {
+    if (remainingWorkingDays > 0) {
+      const minutesPerDay = Math.ceil(
+        Math.abs(finalBalance) / remainingWorkingDays,
+      );
+      chrome.runtime.sendMessage({
+        action: "minutesPerDayToCoverDeficit",
+        data: `To Cover Deficit: <span class="yellow-color">${minutesToTime(minutesPerDay)}</span> Extra Per Day (in ${remainingWorkingDays} remaining work days)`,
+      });
+    } else {
+      chrome.runtime.sendMessage({
+        action: "minutesPerDayToCoverDeficit",
+        data: `<span class="red-color">Cannot cover deficit: No working days left this month.</span>`,
+      });
+    }
+  } else {
+    if (remainingWorkingDays > 0 && finalBalance > 0) {
+      const minutesPerDay = Math.floor(finalBalance / remainingWorkingDays);
+      chrome.runtime.sendMessage({
+        action: "minutesPerDayToCoverDeficit",
+        data: `You can leave early by <span class="green-color">${minutesToTime(minutesPerDay)}</span> Per Day (in ${remainingWorkingDays} remaining work days)`,
+      });
+    } else if (finalBalance > 0) {
+      chrome.runtime.sendMessage({
+        action: "minutesPerDayToCoverDeficit",
+        data: `You have a positive balance of <span class="green-color">${minutesToTime(finalBalance)}</span>. No remaining work days left this month.`,
+      });
+    } else {
+      chrome.runtime.sendMessage({
+        action: "minutesPerDayToCoverDeficit",
+        data: `<span class="green-color">Balance is exactly zero.</span>`,
+      });
+    }
+  }
+
+  // ***************** Calculate per day minutes to cover deficit *******************
 };
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
